@@ -54,11 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
             seconds: Math.floor(seconds)
         };
     }
-    function getZero (num) {
+
+    function getZero(num) {
         if (num >= 0 && num < 10) {
-            return(`0${num}`);
+            return (`0${num}`);
         } else {
-            return(num);
+            return (num);
         }
     }
 
@@ -67,8 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
             hours = document.querySelector('#hours'),
             minutes = document.querySelector('#minutes'),
             seconds = document.querySelector('#seconds'),
-            timeInterval = setInterval(updateClock, 1000); 
-            updateClock();
+            timeInterval = setInterval(updateClock, 1000);
+        updateClock();
 
         function updateClock() {
             const newTime = getTimeRemaining(dadline);
@@ -76,18 +77,69 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newTime.t <= 0) {
                 clearInterval(timeInterval);
             } else {
-                days.innerHTML = getZero (newTime.days);
-                hours.innerHTML = getZero (newTime.hours);
-                minutes.innerHTML = getZero (newTime.minutes);
-                seconds.innerHTML = getZero (newTime.seconds);
+                days.innerHTML = getZero(newTime.days);
+                hours.innerHTML = getZero(newTime.hours);
+                minutes.innerHTML = getZero(newTime.minutes);
+                seconds.innerHTML = getZero(newTime.seconds);
             }
         }
     }
     setClock();
 
+    //Modal
+    const modal = document.querySelector('.modal'),
+        modalTriger = document.querySelectorAll('[data-modal]'),
+        closeModalBtn = document.querySelectorAll('[data-modalClose]');
 
+    modalTriger.forEach(element => {
+        element.addEventListener('click', () => {
+            showModal(modal);
+        });
+    });
 
+    closeModalBtn.forEach(element => {
+        element.addEventListener('click', () => {
+            closeModal(modal);
+        });
+    });
 
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal(modal);
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        if (e.code == 'Escape' && modal.classList.contains('show')) {
+            closeModal(modal);
+        }
+    });
+
+    const modalTimerId = setTimeout(() => {
+        showModal(modal);
+    }, 5000);
+
+    function showModalScroll () {
+            if (document.documentElement.scrollTop + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+                showModal(modal);
+                document.removeEventListener('scroll',showModalScroll);
+            }
+    }
+    document.addEventListener('scroll',showModalScroll);
+    
+
+    function showModal(params) {
+        params.classList.add('show');
+        params.classList.remove('hide');
+        document.body.style.overflow = 'hidden';
+        clearTimeout(modalTimerId);
+    }
+
+    function closeModal(params) {
+        params.classList.add('hide');
+        params.classList.remove('show');
+        document.body.style.overflow = '';
+    }
 
 
 });
