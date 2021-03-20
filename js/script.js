@@ -119,14 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
         showModal(modal);
     }, 5000);
 
-    function showModalScroll () {
-            if (document.documentElement.scrollTop + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
-                showModal(modal);
-                document.removeEventListener('scroll',showModalScroll);
-            }
+    function showModalScroll() {
+        if (document.documentElement.scrollTop + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+            showModal(modal);
+            document.removeEventListener('scroll', showModalScroll);
+        }
     }
-    document.addEventListener('scroll',showModalScroll);
-    
+    document.addEventListener('scroll', showModalScroll);
+
 
     function showModal(params) {
         params.classList.add('show');
@@ -141,5 +141,61 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
     }
 
+    // Cards
+    const menuField = document.querySelector('.menu__field'),
+        container = menuField.querySelector('.container'),
+        menuItem = menuField.querySelectorAll('.menu__item');
+
+    class Card {
+        constructor(obj) {
+            this.img = obj.img;
+            this.title = obj.title;
+            this.text = obj.text;
+            this.price = obj.price;
+        }
+        createCard() {
+            container.insertAdjacentHTML("beforeend", `
+        <div class="menu__item">
+                    <img src="${this.img}" alt="vegy">
+                    <h3 class="menu__item-subtitle">${this.title}</h3>
+                    <div class="menu__item-descr">${this.text}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    </div>
+                </div>
+        `);
+
+        }
+    }
+    container.innerHTML = '';
+
+    const fitnes = {
+        img: "img/tabs/vegy.jpg",
+        title: 'Меню "Фитнес"',
+        text: 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        price: '225'
+    };
+    const premium = {
+        img: "img/tabs/elite.jpg",
+        title: 'Меню “Премиум”',
+        text: 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+        price: '550'
+    };
+    const simple = {
+        img: "img/tabs/post.jpg",
+        title: 'Меню "Постное"',
+        text: 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+        price: '430'
+    };
+
+    const menuFitnes = new Card(fitnes);
+    const menuFitnes1 = new Card(premium);
+    const menuFitnes2 = new Card(simple);
+
+    menuFitnes.createCard();
+    menuFitnes1.createCard();
+    menuFitnes2.createCard();
 
 });
