@@ -16,6 +16,9 @@
     "url": "https://github.com/Ledich19/Project_01/issues"
   },
   "homepage": "https://github.com/Ledich19/Project_01#readme",
+  "dependencies": {
+    "jshint": "^2.12.0"
+  },
   "devDependencies": {
     "json-server": "^0.16.3"
   }

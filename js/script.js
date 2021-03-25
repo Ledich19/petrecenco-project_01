@@ -99,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modal.addEventListener('click', (e) => {
         if (e.target === modal || e.target.getAttribute('data-close') == '') {
-            console.log(e);
             closeModal(modal);
         }
     });
@@ -140,11 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuField = document.querySelector('.menu__field'),
         container = menuField.querySelector('.container');
     class MenuCard {
-        constructor(img, alt, title, text, price, parentSelector, ...classes) {
+        constructor(img, alt, title, descr, price, parentSelector, ...classes) {
             this.img = img;
             this.alt = alt;
             this.title = title;
-            this.text = text;
+            this.descr = descr;
             this.price = price;
             this.classes = classes;
             this.perent = document.querySelector(parentSelector);
@@ -168,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             element.innerHTML = `
                     <img src="${this.img}" alt="${this.alt}">
                     <h3 class="menu__item-subtitle">${this.title}</h3>
-                    <div class="menu__item-descr">${this.text}</div>
+                    <div class="menu__item-descr">${this.descr}</div>
                     <div class="menu__item-divider"></div>
                     <div class="menu__item-price">
                         <div class="menu__item-cost">Цена:</div>
@@ -178,37 +177,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const menuFitnes = new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegi",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        '11',
-        '.menu .container',
-        'menu__item'
-    );
-    menuFitnes.render();
+    const getResource = async (url) => {
+        const res = await fetch(url);
 
-    new MenuCard(
-        "img/tabs/elite.jpg",
-        "vegi",
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        '25',
-        '.menu .container',
-        'menu__item'
-    ).render();
+        if (!res.ok) {
+            throw new Error(`could not fetch ${url}, status ${res.status}`);
+        }
 
-    const menuFitnes2 = new MenuCard(
-        "img/tabs/post.jpg",
-        "vegi",
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        '18',
-        '.menu .container',
-        'menu__item'
-    );
-    menuFitnes2.render();
+        return await res.json();
+    };
+
+    getResource('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(({img, alt, title, descr, price}) => {
+                new MenuCard(img, alt, title, descr ,price, '.menu .container', 'menu__item').render();
+            });
+        });
+
 
     //forms
 
@@ -264,10 +249,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     forms.forEach(item => {
-        postData(item);
+        bindPostData(item);
     });
 
-    function postData(form) {
+    const postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: data
+        });
+
+        return await res.json();
+    };
+
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -280,29 +277,23 @@ document.addEventListener('DOMContentLoaded', () => {
             form.append(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', ' server.php');
-            request.setRequestHeader("Contents-type", 'application/json');
             const formData = new FormData(form);
-            const object = {};
-            formData.forEach(function (value, key) {
-                object[key] = value;
-            });
 
-            const json = JSON.stringify(object);
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
+            postData('http://localhost:3000/requests', json)
+                .then(data => {
+                    console.log(data);
                     showThenksModal(message.success);
-                    form.reset();
-                        statusMessage.remove();
-                } else {
+                    statusMessage.remove();
+                })
+                .catch(() => {
                     showThenksModal(message.failure);
-                }
-            });
+                })
+                .finally(() => {
+                    form.reset();
+                });
+
         });
     }
 
@@ -329,4 +320,9 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal(modal);
         }, 4000);
     }
+
+    // fetch('http://localhost:3000/menu')
+    //     .then(data => data.json())
+    //     .then(res => console.log(res));
+
 });
