@@ -118,4 +118,4 @@ function calk() {
     // Очень высокий —  1.9
 }
 
-module.exports = calk;
+export default calk;

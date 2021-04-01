@@ -51,4 +51,4 @@ function timer() {
        setClock();
 }
 
-module.exports = timer;
+export default  timer;

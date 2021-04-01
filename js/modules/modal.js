@@ -1,52 +1,61 @@
-function modal() {
+function showModal(modalSelector, modalTimerId) {
+    const modal = document.querySelector(modalSelector);
+
+    modal.classList.add('show');
+    modal.classList.remove('hide');
+    document.body.style.overflow = 'hidden';
+
+    console.log(modalTimerId);
+    if (modalTimerId) {
+        clearTimeout(modalTimerId);
+    }
+}
+
+function closeModal(modalSelector) {
+    const modal = document.querySelector(modalSelector);
+
+    modal.classList.add('hide');
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function modal(triggerSelector, modalSelector, modalTimerId) {
     //Modal
-    const modal = document.querySelector('.modal'),
-        modalTriger = document.querySelectorAll('[data-modal]');
+    const modal = document.querySelector(modalSelector),
+        modalTriger = document.querySelectorAll(triggerSelector);
 
     modalTriger.forEach(element => {
         element.addEventListener('click', () => {
-            showModal(modal);
+            showModal(modalSelector, modalTimerId);
         });
     });
 
 
     modal.addEventListener('click', (e) => {
         if (e.target === modal || e.target.getAttribute('data-close') == '') {
-            closeModal(modal);
+            closeModal(modalSelector);
         }
     });
 
     document.addEventListener('keyup', (e) => {
         if (e.code == 'Escape' && modal.classList.contains('show')) {
-            closeModal(modal);
+            closeModal(modalSelector);
         }
     });
 
-    const modalTimerId = setTimeout(() => {
-        showModal(modal);
-    }, 5000);
 
     function showModalScroll() {
         if (document.documentElement.scrollTop + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
-            showModal(modal);
+            showModal(modalSelector, modalTimerId);
             document.removeEventListener('scroll', showModalScroll);
         }
     }
     document.addEventListener('scroll', showModalScroll);
 
 
-    function showModal(params) {
-        params.classList.add('show');
-        params.classList.remove('hide');
-        document.body.style.overflow = 'hidden';
-        clearTimeout(modalTimerId);
-    }
-
-    function closeModal(params) {
-        params.classList.add('hide');
-        params.classList.remove('show');
-        document.body.style.overflow = '';
-    }
+    
 
 }
-module.exports = modal;
+export default  modal;
+export {closeModal};
+export {showModal};
